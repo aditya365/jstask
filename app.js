@@ -35,11 +35,11 @@ async function fetchTopNPlanets(n) {
 function csvToJson(csv) {
     const lines = csv.split('\n');
     const headings = lines[0].split(',');
-    let result = [];
+    const result = [];
     for (let i = 1; i < lines.length; i++) {
-        var obj = {};
-        var currentline = lines[i].split(",");
-        for (var j = 0; j < headings.length; j++) {
+        const obj = {};
+        const currentline = lines[i].split(",");
+        for (let j = 0; j < headings.length; j++) {
             obj[headings[j]] = currentline[j];
         }
         result.push(obj);
