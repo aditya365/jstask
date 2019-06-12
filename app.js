@@ -1,17 +1,24 @@
 async function fetchTopNPlanets(n) {
     try {
+        //construct request URLs
         let requests = [];
-        for (let i = 1; i <= 10; i++) {
-            requests.push({ n: i, url: `https://swapi.co/api/planets/${i}` });
+        for (let i = 1; i <= n; i++) {
+            requests.push(`https://swapi.co/api/planets/${i}`);
         }
+
         let data = await Promise.all(
             requests.map(
-                request =>
-                    fetch(request.url).then(
+                (request, index) =>
+                    fetch(request).then(
                         (response) => {
-                            return { n: request.n, planet: response.json() }
+                            return response.json()
                         }
-                    )));
+                    ).then(data => {
+                        return {
+                            name: data.name, index: index + 1
+                        }
+                    })
+            ));
         return (data)
     } catch (error) {
         console.log(error)
@@ -21,11 +28,10 @@ async function fetchTopNPlanets(n) {
 
 (async () => {
     let response = await fetchTopNPlanets(10);
-    response.map(r => {
-//        console.log(r.n, r.planet.name);
-    });
+    response.map(r => console.log(`planet ${r.index} - ${r.name}`));
 })();
 
+// converts csv string to json
 function csvToJson(csv) {
     const lines = csv.split('\n');
     const headings = lines[0].split(',');
@@ -41,18 +47,19 @@ function csvToJson(csv) {
     return result;
 }
 
+// converts json to csv
 function jsonToCSV(jsonData) {
     let csv = ``;
     csv = csv.concat(Object.keys(jsonData[0]).join(','));
     csv = csv.concat('\n');
-    for (let i = 0; i < jsonData.length-1; i++) {
+    for (let i = 0; i < jsonData.length - 1; i++) {
         csv = csv.concat(Object.values(jsonData[i]).join(','));
         csv = csv.concat('\n');
     }
     return csv;
 }
 
-
+// sample csv data
 let csvData = `Device Name,Platform,OS Version,Portrait Width,Landscape Width,Release Date
 Acer Iconia Tab A1-810,Android,4.2.2,768,1024,2013-05
 Acer Iconia Tab A100,Android,4.0.3,800,1280,2011-04
