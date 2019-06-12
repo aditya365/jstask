@@ -1,11 +1,15 @@
-async function fetchPlanets(urls) {
+async function fetchTopNPlanets(n) {
     try {
-        var data = await Promise.all(
-            urls.map(
-                url =>
-                    fetch(url).then(
+        let requests = [];
+        for (let i = 1; i <= 10; i++) {
+            requests.push({ n: i, url: `https://swapi.co/api/planets/${i}` });
+        }
+        let data = await Promise.all(
+            requests.map(
+                request =>
+                    fetch(request.url).then(
                         (response) => {
-                            return response.json()
+                            return { n: request.n, planet: response.json() }
                         }
                     )));
         return (data)
@@ -15,11 +19,9 @@ async function fetchPlanets(urls) {
     }
 }
 
-var urls = [];
-for (let i = 1; i <= 10; i++) {
-    urls.push(`https://swapi.co/api/planets/${i}`);
-}
 (async () => {
-    var response = await fetchPlanets(urls);
-    console.log(response.map(planet=>planet.name));
+    let response = await fetchTopNPlanets(10);
+    response.map(r => {
+        console.log(r.n, r.planet.name);
+    });
 })();
